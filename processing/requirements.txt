@@ -1,0 +1,7 @@
+rasterio
+numpy
+scipy
+geopandas
+osmium
+jupyterlab
+matplotlib
