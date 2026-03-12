@@ -2,9 +2,8 @@ import { H3HexagonLayer } from "@deck.gl/geo-layers";
 import DeckGL from "@deck.gl/react";
 import { rgb } from "d3-color";
 import { interpolateRdYlGn } from "d3-scale-chromatic";
-import maplibregl from "maplibre-gl";
 import { useCallback, useMemo, useState } from "react";
-import Map from "react-map-gl/maplibre";
+import { AttributionControl, Map } from "react-map-gl/maplibre";
 import data from "../data/scenic_scores.json";
 import Legend from "./Legend";
 
@@ -94,7 +93,7 @@ export default function ScenicMap() {
   }, []);
 
   return (
-    <div className="w-full h-screen">
+    <>
       <Legend
         extruded={extruded}
         setExtruded={setExtruded}
@@ -110,15 +109,10 @@ export default function ScenicMap() {
         getTooltip={getTooltip}
         glOptions={{ webgl2: true }}
       >
-        <Map
-          mapLib={maplibregl}
-          mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-          attributionControl={false}
-          style={{ width: "100%", height: "100%" }}
-        >
-          {/* <AttributionControl compact={true} position="top-left" /> */}
+        <Map mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json">
+          <AttributionControl compact={false} position="bottom-right" />
         </Map>
       </DeckGL>
-    </div>
+    </>
   );
 }
