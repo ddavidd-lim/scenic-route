@@ -1,3 +1,7 @@
 packages:
   - frontend
   - backend
+
+onlyBuiltDependencies:
+  - '@vaadin/vaadin-usage-statistics'
+  - esbuild
