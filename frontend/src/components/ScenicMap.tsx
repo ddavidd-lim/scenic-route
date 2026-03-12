@@ -3,7 +3,7 @@ import DeckGL from "@deck.gl/react";
 import { rgb } from "d3-color";
 import { interpolateRdYlGn } from "d3-scale-chromatic";
 import maplibregl from "maplibre-gl";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Map from "react-map-gl/maplibre";
 import data from "../data/scenic_scores.json";
 import Legend from "./Legend";
@@ -37,26 +37,32 @@ type H3CellData = {
 export default function ScenicMap() {
   const [extruded, setExtruded] = useState(false);
   const [minScore, setMinScore] = useState(0);
-  const [hovered, setHovered] = useState<H3CellData | null>(null);
+  // const [hovered, setHovered] = useState<H3CellData | null>(null);
 
-  const filtered = (data as H3CellData[]).filter((d) => d.score >= minScore);
+  const filtered = useMemo(
+    () => (data as H3CellData[]).filter((d) => d.score >= minScore),
+    [minScore],
+  );
 
-  const layer = new H3HexagonLayer({
-    id: "scenic-hex",
-    data: filtered,
-    getHexagon: (d: H3CellData) => d.h3_cell,
-    getFillColor: (d: H3CellData) => getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
-    getElevation: (d: H3CellData) => d.score * 80,
-    elevationScale: extruded ? 8 : 0,
-    extruded,
-    pickable: true,
-    autoHighlight: true,
-    highlightColor: [255, 255, 255, 60],
-    onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
-    updateTriggers: {
-      getFillColor: [hovered],
-    },
-  });
+  const layer = useMemo(
+    () =>
+      new H3HexagonLayer({
+        id: "scenic-hex",
+        data: filtered,
+        getHexagon: (d: H3CellData) => d.h3_cell,
+        getFillColor: (d: H3CellData) => getColor(d.score),
+        // getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
+
+        getElevation: (d: H3CellData) => d.score * 80,
+        elevationScale: extruded ? 8 : 0,
+        extruded,
+        pickable: true,
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 60],
+        // onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
+      }),
+    [filtered, extruded],
+  );
 
   const getTooltip = useCallback(({ object }: { object: H3CellData | null }) => {
     if (!object) return null;
