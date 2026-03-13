@@ -36,6 +36,7 @@ type H3CellData = {
 export default function ScenicMap() {
   const [extruded, setExtruded] = useState(false);
   const [minScore, setMinScore] = useState(0);
+  const [hideLayer, setHideLayer] = useState(false);
   // const [hovered, setHovered] = useState<H3CellData | null>(null);
 
   const filtered = useMemo(
@@ -43,24 +44,27 @@ export default function ScenicMap() {
     [minScore],
   );
 
-  const layer = useMemo(
+  const layers = useMemo(
     () =>
-      new H3HexagonLayer({
-        id: "scenic-hex",
-        data: filtered,
-        getHexagon: (d: H3CellData) => d.h3_cell,
-        getFillColor: (d: H3CellData) => getColor(d.score),
-        // getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
+      [
+        !hideLayer &&
+          new H3HexagonLayer({
+            id: "scenic-hex",
+            data: filtered,
+            getHexagon: (d: H3CellData) => d.h3_cell,
+            getFillColor: (d: H3CellData) => getColor(d.score),
+            // getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
 
-        getElevation: (d: H3CellData) => d.score * 80,
-        elevationScale: extruded ? 8 : 0,
-        extruded,
-        pickable: true,
-        autoHighlight: true,
-        highlightColor: [255, 255, 255, 60],
-        // onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
-      }),
-    [filtered, extruded],
+            getElevation: (d: H3CellData) => d.score * 80,
+            elevationScale: extruded ? 8 : 0,
+            extruded,
+            pickable: true,
+            autoHighlight: true,
+            highlightColor: [255, 255, 255, 60],
+            // onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
+          }),
+      ].filter(Boolean),
+    [hideLayer, filtered, extruded],
   );
 
   const getTooltip = useCallback(({ object }: { object: H3CellData | null }) => {
@@ -100,17 +104,19 @@ export default function ScenicMap() {
         minScore={minScore}
         setMinScore={setMinScore}
         numCells={filtered.length}
+        hideLayer={hideLayer}
+        setHideLayer={setHideLayer}
       />
       {/* Map */}
       <DeckGL
         initialViewState={INITIAL_VIEW}
         controller={true}
-        layers={[layer]}
+        layers={layers}
         getTooltip={getTooltip}
         glOptions={{ webgl2: true }}
       >
         <Map mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json">
-          <AttributionControl compact={false} position="bottom-right" />
+          <AttributionControl compact={true} position="bottom-right" />
         </Map>
       </DeckGL>
     </>

@@ -4,8 +4,18 @@ type Props = {
   minScore: number;
   setMinScore: (value: number) => void;
   numCells: number;
+  hideLayer: boolean;
+  setHideLayer: (value: boolean) => void;
 };
-export default function Legend({ extruded, setExtruded, minScore, setMinScore, numCells }: Props) {
+export default function Legend({
+  extruded,
+  setExtruded,
+  minScore,
+  setMinScore,
+  numCells,
+  hideLayer,
+  setHideLayer,
+}: Props) {
   return (
     <>
       {/* Controls */}
@@ -57,6 +67,36 @@ export default function Legend({ extruded, setExtruded, minScore, setMinScore, n
             />
           </div>
           3D Extrusion
+        </label>
+
+        {/* Layer toggle */}
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <div
+            onClick={() => setHideLayer(!hideLayer)}
+            style={{
+              width: 36,
+              height: 20,
+              borderRadius: 10,
+              background: hideLayer ? "#4caf7d" : "#333",
+              position: "relative",
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 3,
+                left: hideLayer ? 18 : 3,
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                background: "#fff",
+                transition: "left 0.2s",
+              }}
+            />
+          </div>
+          Hide Layer
         </label>
 
         {/* Score filter */}
