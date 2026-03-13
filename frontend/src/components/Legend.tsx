@@ -6,6 +6,8 @@ type Props = {
   numCells: number;
   hideLayer: boolean;
   setHideLayer: (value: boolean) => void;
+  mapStyle: string;
+  setMapStyle: (value: string) => void;
 };
 export default function Legend({
   extruded,
@@ -15,6 +17,8 @@ export default function Legend({
   numCells,
   hideLayer,
   setHideLayer,
+  mapStyle,
+  setMapStyle,
 }: Props) {
   return (
     <>
@@ -97,6 +101,25 @@ export default function Legend({
             />
           </div>
           Hide Layer
+        </label>
+
+        {/* Map style toggle */}
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <select
+            value={mapStyle}
+            onChange={(e) => setMapStyle(e.target.value)}
+            style={{
+              background: "#333",
+              color: "#c0c0c0",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 6,
+              padding: "4px 8px",
+              cursor: "pointer",
+            }}
+          >
+            <option value="satellite">Satellite</option>
+            <option value="dark">Dark</option>
+          </select>
         </label>
 
         {/* Score filter */}
