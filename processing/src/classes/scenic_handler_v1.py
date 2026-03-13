@@ -4,31 +4,28 @@ from osmium.filter import TagFilter
 import h3
 import json
 
-water_data = json.load(open("constants/water_tags.json"))
-water_tags = [v for (k, v) in water_data]
-
-vegetation_data = json.load(open("constants/vegetation_tags.json"))
-vegetation_tags = [v for (k, v) in vegetation_data]
-
-geological_data = json.load(open("constants/natural_geology_related_tags.json"))
-geological_tags = [v for (k, v) in geological_data]
-
-waterway_data = json.load(open("constants/waterway_tags.json"))
-waterway_tags = [v for (k, v) in waterway_data]
-
-print(f"Water tags: {water_tags}")
-print(f"Vegetation tags: {vegetation_tags}")
-print(f"Geological tags: {geological_tags}")
-print(f"Waterway tags: {waterway_tags}")
 
 class ScenicHandler(osmium.SimpleHandler):
     """
     Fine grained implementation of a handler considering overlap.
     """
-    def __init__(self, resolution=8):
+
+    def __init__(
+        self, water_data, vegetation_data, geological_data, waterway_data, resolution=8
+    ):
         super().__init__()
         self.resolution = resolution
         self.cells = {}  # h3_cell_id -> dict of counts
+
+        self.water_tags = [v for (k, v) in water_data]
+        self.vegetation_tags = [v for (k, v) in vegetation_data]
+        self.geological_tags = [v for (k, v) in geological_data]
+        self.waterway_tags = [v for (k, v) in waterway_data]
+
+        print(f"Water tags: {self.water_tags}")
+        print(f"Vegetation tags: {self.vegetation_tags}")
+        print(f"Geological tags: {self.geological_tags}")
+        print(f"Waterway tags: {self.waterway_tags}")
 
     def _get_cell(self, lat, lng):
         # Get the H3 cell for the given lat/lng, creating an entry if it doesn't exist.
@@ -61,7 +58,8 @@ class ScenicHandler(osmium.SimpleHandler):
         # there to avoid double-counting.
         tags = w.tags
         if not (
-            tags.get("natural") in water_tags or tags.get("waterway") in waterway_tags
+            tags.get("natural") in self.water_tags
+            or tags.get("waterway") in self.waterway_tags
         ):
             return
 
@@ -75,7 +73,10 @@ class ScenicHandler(osmium.SimpleHandler):
     def area(self, a: osm.Area):
         tags = a.tags
 
-        if tags.get("landuse") == "forest" or tags.get("natural") in vegetation_tags:
+        if (
+            tags.get("landuse") == "forest"
+            or tags.get("natural") in self.vegetation_tags
+        ):
             feature = "landcover"
         elif (
             tags.get("leisure") in ("park", "nature_reserve")
@@ -84,7 +85,7 @@ class ScenicHandler(osmium.SimpleHandler):
             feature = "recreation"
         elif tags.get("landuse") in ("industrial", "commercial"):
             feature = "urban"
-        elif tags.get("natural") in geological_tags:
+        elif tags.get("natural") in self.geological_tags:
             feature = "relief"
         else:
             return

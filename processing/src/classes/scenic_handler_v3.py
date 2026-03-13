@@ -3,22 +3,6 @@ from collections import defaultdict
 import osmium
 from osmium import osm
 import h3
-import json
-
-water_data = json.load(open("constants/natural_water_tags.json"))
-vegetation_data = json.load(open("constants/natural_vegetation_tags.json"))
-geological_data = json.load(open("constants/natural_geological_tags.json"))
-waterway_data = json.load(open("constants/waterway_tags.json"))
-
-water_tags = {v for (k, v) in water_data}
-vegetation_tags = {v for (k, v) in vegetation_data}
-geological_tags = {v for (k, v) in geological_data}
-waterway_tags = {v for (k, v) in waterway_data}
-
-print(f"Water tags: {water_tags}")
-print(f"Vegetation tags: {vegetation_tags}")
-print(f"Geological tags: {geological_tags}")
-print(f"Waterway tags: {waterway_tags}")
 
 LEISURE_RECREATION_TAGS = {"park", "garden", "nature_reserve"}
 
@@ -32,12 +16,11 @@ LANDUSE_URBAN_TAGS = {
     "port",
 }
 
-
 class ScenicHandler(osmium.SimpleHandler):
     """
     Taking into account the water / geology related tags in the natural tags.
     """
-    def __init__(self, resolution=8):
+    def __init__(self, water_data, vegetation_data, geological_data, waterway_data, resolution=8):
         super().__init__()
         self.resolution = resolution
         self.cells = defaultdict(
@@ -50,6 +33,16 @@ class ScenicHandler(osmium.SimpleHandler):
                 "urban": 0,
             }
         )  # h3_cell_id -> dict of counts
+        
+        self.water_tags = {v for (k, v) in water_data}
+        self.vegetation_tags = {v for (k, v) in vegetation_data}
+        self.geological_tags = {v for (k, v) in geological_data}
+        self.waterway_tags = {v for (k, v) in waterway_data}
+
+        print(f"Water tags: {self.water_tags}")
+        print(f"Vegetation tags: {self.vegetation_tags}")
+        print(f"Geological tags: {self.geological_tags}")
+        print(f"Waterway tags: {self.waterway_tags}")
 
     def _get_cell(self, lat, lng):
         # Get the H3 cell for the given lat/lng
@@ -70,11 +63,11 @@ class ScenicHandler(osmium.SimpleHandler):
         cell = self._get_cell(lat, lng)
 
         if natural:
-            if natural in water_tags:
+            if natural in self.water_tags:
                 cell["water"] += 1
-            if natural in vegetation_tags:
+            if natural in self.vegetation_tags:
                 cell["landcover"] += 1
-            if natural in geological_tags:
+            if natural in self.geological_tags:
                 cell["relief"] += 1
 
         if waterway:

@@ -27,3 +27,5 @@ dist-ssr
 .ipynb_checkpoints/
 
 .*env
+
+__pycache__
