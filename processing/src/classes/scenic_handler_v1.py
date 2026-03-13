@@ -22,6 +22,9 @@ print(f"Geological tags: {geological_tags}")
 print(f"Waterway tags: {waterway_tags}")
 
 class ScenicHandler(osmium.SimpleHandler):
+    """
+    Fine grained implementation of a handler considering overlap.
+    """
     def __init__(self, resolution=8):
         super().__init__()
         self.resolution = resolution

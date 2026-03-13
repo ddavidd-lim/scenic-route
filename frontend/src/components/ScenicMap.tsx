@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { AttributionControl, Map } from "react-map-gl/maplibre";
 import data from "../data/scenic_scores.json";
 import Legend from "./Legend";
+import { MAPTILER_API_KEY } from "../constants/env";
 
 const INITIAL_VIEW = {
   longitude: -119.5,
@@ -15,7 +16,7 @@ const INITIAL_VIEW = {
   bearing: 0,
 };
 
-function getColor(score: number, opacity = 190): [number, number, number, number] {
+function getColor(score: number, opacity = 150): [number, number, number, number] {
   const c = rgb(interpolateRdYlGn(score / 100));
   return [c.r, c.g, c.b, opacity];
 }
@@ -115,7 +116,7 @@ export default function ScenicMap() {
         getTooltip={getTooltip}
         glOptions={{ webgl2: true }}
       >
-        <Map mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json">
+        <Map mapStyle={`https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_API_KEY}`}>
           <AttributionControl compact={true} position="bottom-right" />
         </Map>
       </DeckGL>

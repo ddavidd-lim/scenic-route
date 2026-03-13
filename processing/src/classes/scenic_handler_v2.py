@@ -6,6 +6,10 @@ import h3
 
 
 class ScenicHandler(osmium.SimpleHandler):
+    """
+    More basic implementation of a handler using only nodes and ways.  
+    Will not consider overlap.
+    """
     def __init__(self, resolution=8):
         super().__init__()
         self.resolution = resolution
