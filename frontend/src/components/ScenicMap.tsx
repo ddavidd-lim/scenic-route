@@ -47,28 +47,25 @@ export default function ScenicMap() {
     [minScore],
   );
 
-  const layers = useMemo(
-    () =>
-      [
-        !hideLayer &&
-          new H3HexagonLayer({
-            id: "scenic-hex",
-            data: filtered,
-            getHexagon: (d: H3CellData) => d.h3_cell,
-            getFillColor: (d: H3CellData) => getColor(d.score),
-            // getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
+  const hexagonLayer = useMemo(() => {
+    return new H3HexagonLayer({
+      id: "scenic-hex",
+      data: filtered,
+      getHexagon: (d: H3CellData) => d.h3_cell,
+      getFillColor: (d: H3CellData) => getColor(d.score),
+      // getColor(d.score, hovered?.h3_cell === d.h3_cell ? 255 : 190),
 
-            getElevation: (d: H3CellData) => d.score * 80,
-            elevationScale: extruded ? 8 : 0,
-            extruded,
-            pickable: true,
-            autoHighlight: true,
-            highlightColor: [255, 255, 255, 60],
-            // onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
-          }),
-      ].filter(Boolean),
-    [hideLayer, filtered, extruded],
-  );
+      getElevation: (d: H3CellData) => d.score * 80,
+      elevationScale: extruded ? 8 : 0,
+      extruded,
+      autoHighlight: true,
+      highlightColor: [255, 255, 255, 60],
+      // onHover: (info: { object: H3CellData | null }) => setHovered(info.object ?? null),
+      visible: !hideLayer,
+    });
+  }, [filtered, extruded, hideLayer]);
+
+  const layers = [hexagonLayer];
 
   const getTooltip = useCallback(({ object }: { object: H3CellData | null }) => {
     if (!object) return null;
